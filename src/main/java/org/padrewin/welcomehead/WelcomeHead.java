@@ -26,15 +26,17 @@ return instance;
 if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
 
 
-  getLogger().info("------------------------------");
-  getLogger().info(" ");
-  getLogger().info("-------- WelcomeHead ---------");
-  getLogger().info("PlaceHolderApi : OK");
-  getLogger().info("Version : " + Bukkit.getVersion());
-  getLogger().info(" ");
-  getLogger().info("Starting WelcomeHead...");
-  getLogger().info(" ");
-  getLogger().info("------------------------------");
+  String name = getDescription().getName();
+  getLogger().info("");
+  getLogger().info("  ____ ___  _     ____  ");
+  getLogger().info(" / ___/ _ \\| |   |  _ \\ ");
+  getLogger().info("| |  | | | | |   | | | |");
+  getLogger().info("| |__| |_| | |___| |_| |");
+  getLogger().info(" \\____\\___/|_____|____/");
+  getLogger().info("    " + name + " v" + getDescription().getVersion());
+  getLogger().info("    Author(s): " + (String)getDescription().getAuthors().get(0));
+  getLogger().info("    (c) Cold Development. All rights reserved.");
+  getLogger().info("");
 
 
   saveDefaultConfig();
