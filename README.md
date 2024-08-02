@@ -15,7 +15,7 @@ Spaces-Top: 2
 Spaces-Bot: 0
 
 # Time when you want the message to appear (in seconds)
-Timer: 5
+Timer: 3
 
 # ----------------- First time join -----------------------------
 
