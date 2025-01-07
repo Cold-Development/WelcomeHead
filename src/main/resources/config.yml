@@ -1,3 +1,11 @@
+#########################################################################################################
+#    Plugin now supports full hex color codes.                                                          #
+#    You can use https://www.birdflop.com/resources/rgb/ to create your colors                          #
+#    Developer; padrewin || Cold Development                                                            #
+#    GitHub; https://github.com/padrewin || https://github.com/Cold-Development                         #
+#    Links: https://colddev.dev || https://discord.colddev.dev                                          #
+#########################################################################################################
+
 prefix: "&8「&#6E00A5W&#760EAEe&#7D1CB7l&#8529C0c&#8D37C9o&#9545D2m&#9C53DBe&#A461E4H&#AC6EEDe&#B37CF6a&#BB8AFFd&8」&7» &f"
 
 # Spaces = clean the chat before giving the text (for player only)
