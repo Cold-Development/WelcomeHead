@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -17,8 +18,9 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.padrewin.welcomehead.WelcomeHead;
 
 public class Utils {
-  public static String translateHexColorCodes(String startTag, String endTag, String message) {
-    Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
+  public static String translateColors(String message) {
+    // 1. Procesăm mai întâi culorile HEX
+    Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
     Matcher matcher = hexPattern.matcher(message);
     StringBuffer buffer = new StringBuffer(message.length() + 32);
     while (matcher.find()) {
@@ -28,8 +30,12 @@ public class Utils {
               .charAt(2) + '§' + group.charAt(3) + '§' + group
               .charAt(4) + '§' + group.charAt(5));
     }
-    return matcher.appendTail(buffer).toString();
+    message = matcher.appendTail(buffer).toString();
+
+    // 2. Procesăm culorile clasice de Minecraft (& + cod)
+    return ChatColor.translateAlternateColorCodes('&', message);
   }
+
 
   public static void spawnFireworks(Location location, int amount) {
     if (WelcomeHead.getInstance().getConfig().getInt("Firework.amount") != 0) {
@@ -63,7 +69,7 @@ public class Utils {
         CenterText.sendCenteredMessage(player, msg);
         continue;
       }
-      PlaceholderAPI.setPlaceholders(player, translateHexColorCodes("&#", "", msg));
+      PlaceholderAPI.setPlaceholders(player, translateColors(msg));
     }
   }
 
