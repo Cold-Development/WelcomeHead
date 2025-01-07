@@ -45,13 +45,13 @@ Players-FirstJoin:
 # You need something when the player spawns?
 # Put your commands without "/"
 Commands-First:
-  - ""
+  - say WELCOME
 
 # Need a Sound when the player joins for the first time?
 # Sounds : https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
 SoundA:
   enable: true
-  sound: ENTITY_VILLAGER_CELEBRATE
+  sound: ENTITY_GOAT_SCREAMING_DEATH
   # Values: 0.0 -> 1.0
   volume: 1.0
   # Values: 0.0 -> 1.0
@@ -89,7 +89,8 @@ Players-Back:
 
 # You need something when the player spawns?
 # Put your commands without "/"
-Commands-Back: []
+Commands-Back:
+  - say WELCOME BACK
 
 # Need a Sound when the player joins again?
 # Sounds : https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
