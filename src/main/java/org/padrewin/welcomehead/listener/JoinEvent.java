@@ -27,16 +27,23 @@ public class JoinEvent implements Listener {
         final int spaceTop = WelcomeHead.getInstance().getConfig().getInt("Spaces-Top");
         final int spacesBot = WelcomeHead.getInstance().getConfig().getInt("Spaces-Bot");
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask((Plugin) WelcomeHead.getInstance(), new Runnable() {
-            public void run() {
-                if (!player.hasPlayedBefore()) {
+        if (!player.hasPlayedBefore()) {
+            // Este primul login al jucătorului
+            Bukkit.getScheduler().scheduleSyncDelayedTask((Plugin) WelcomeHead.getInstance(), new Runnable() {
+                public void run() {
                     handleFirstJoin(player, spaceTop, spacesBot);
-                } else {
+                }
+            }, WelcomeHead.getInstance().getConfig().getInt("Timer") * 20L);
+        } else {
+            // Este un rejoin al jucătorului
+            Bukkit.getScheduler().scheduleSyncDelayedTask((Plugin) WelcomeHead.getInstance(), new Runnable() {
+                public void run() {
                     handleBackJoin(player, spaceTop, spacesBot);
                 }
-            }
-        }, WelcomeHead.getInstance().getConfig().getInt("Timer") * 20L);
+            }, WelcomeHead.getInstance().getConfig().getInt("Timer") * 20L);
+        }
     }
+
 
     private void handleFirstJoin(Player player, int spaceTop, int spacesBot) {
         if (WelcomeHead.getInstance().getConfig().getBoolean("Players-FirstJoin.enable")) {
@@ -49,8 +56,24 @@ public class JoinEvent implements Listener {
                     WelcomeHead.getInstance().getConfig().getBoolean("Players-FirstJoin.center"));
         }
 
-        playEffectsAndCommands(player, "SoundA", "Commands-First", "First player");
+        // Focuri de artificii
+        int fireworkAmount = WelcomeHead.getInstance().getConfig().getInt("Firework.amount");
+        Utils.spawnFireworks(player.getLocation(), fireworkAmount);
+
+        // Sunete pentru primul login (apelează după artificii)
+        Utils.soundActivated(player,
+                WelcomeHead.getInstance().getConfig().getBoolean("SoundA.enable"),
+                WelcomeHead.getInstance().getConfig().getString("SoundA.sound"),
+                WelcomeHead.getInstance().getConfig().getDouble("SoundA.volume"),
+                WelcomeHead.getInstance().getConfig().getDouble("SoundA.pitch"));
+
+        // Comenzi pentru primul login
+        Utils.commandsActivated(player,
+                WelcomeHead.getInstance().getConfig().getStringList("Commands-First"),
+                "Something is weird with your command -> First player");
     }
+
+
 
     private void handleBackJoin(Player player, int spaceTop, int spacesBot) {
         if (WelcomeHead.getInstance().getConfig().getBoolean("Players-Back.enable")) {
@@ -63,8 +86,19 @@ public class JoinEvent implements Listener {
                     WelcomeHead.getInstance().getConfig().getBoolean("Players-Back.center"));
         }
 
-        playEffectsAndCommands(player, "SoundB", "Commands-Back", "Back player");
+        // Sunete pentru rejoin
+        Utils.soundActivated(player,
+                WelcomeHead.getInstance().getConfig().getBoolean("SoundB.enable"),
+                WelcomeHead.getInstance().getConfig().getString("SoundB.sound"),
+                WelcomeHead.getInstance().getConfig().getDouble("SoundB.volume"),
+                WelcomeHead.getInstance().getConfig().getDouble("SoundB.pitch"));
+
+        Utils.commandsActivated(player,
+                WelcomeHead.getInstance().getConfig().getStringList("Commands-Back"),
+                "Something is weird with your command -> Back player");
+
     }
+
 
     private void sendEmptySpaces(Player player, int spaces) {
         for (int i = 0; i <= spaces; i++) {
