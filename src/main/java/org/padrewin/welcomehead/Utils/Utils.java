@@ -10,7 +10,6 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -38,30 +37,42 @@ public class Utils {
 
 
   public static void spawnFireworks(Location location, int amount) {
-    if (WelcomeHead.getInstance().getConfig().getInt("Firework.amount") != 0) {
-      Location loc = location;
-      Firework fw = (Firework)loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+    if (amount <= 0) {
+      return; // Dacă numărul de artificii este 0 sau mai mic, ieșim
+    }
+
+    for (int i = 0; i < amount; i++) {
+      Firework fw = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
       FireworkMeta fwm = fw.getFireworkMeta();
+
+      // Configurăm efectele artificiilor
       fwm.setPower(2);
-      fwm.addEffect(FireworkEffect.builder().withColor(Color.LIME).flicker(true).build());
+      fwm.addEffect(FireworkEffect.builder()
+              .withColor(Color.LIME) // Schimbă dacă dorești alte culori
+              .flicker(true)
+              .build());
       fw.setFireworkMeta(fwm);
-      fw.detonate();
-      for (int i = 0; i < amount; i++) {
-        Firework fw2 = (Firework)loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-        fw2.setFireworkMeta(fwm);
-      }
+
+      // Amână detonarea artificiului
+      Bukkit.getScheduler().runTaskLater(WelcomeHead.getInstance(), fw::detonate, 20L); // 1 secundă delay
     }
   }
 
+
   public static void commandsActivated(Player player, List<String> path, String errorMsg) {
     try {
-      for (String msg : path)
-        Bukkit.getServer().dispatchCommand((CommandSender)Bukkit.getServer().getConsoleSender(), PlaceholderAPI.setPlaceholders(player, msg));
-    } catch (Exception a) {
+      for (String command : path) {
+        Bukkit.getServer().dispatchCommand(
+                Bukkit.getServer().getConsoleSender(),
+                PlaceholderAPI.setPlaceholders(player, command)
+        );
+      }
+    } catch (Exception e) {
       WelcomeHead.getInstance().getLogger().severe(errorMsg);
-      a.getStackTrace();
+      e.printStackTrace();
     }
   }
+
 
   public static void headNotActivated(Player player, List<String> path, boolean center) {
     for (String msg : path) {
@@ -74,7 +85,16 @@ public class Utils {
   }
 
   public static void soundActivated(Player player, boolean enable, String sound, double volume, double pitch) {
-    if (enable)
-      player.playSound(player.getLocation(), Sound.valueOf(sound), (float)volume, (float)pitch);
+    if (!enable) {
+      return; // Dacă sunetul este dezactivat, ieșim
+    }
+
+    try {
+      Sound soundEnum = Sound.valueOf(sound.toUpperCase());
+      player.playSound(player.getLocation(), soundEnum, (float) volume, (float) pitch);
+    } catch (IllegalArgumentException e) {
+    }
   }
+
+
 }
