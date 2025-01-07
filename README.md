@@ -6,6 +6,14 @@ WelcomeHead is a Minecraft plugin that shows player's head with a welcome messag
 ![Static Badge](https://img.shields.io/badge/config.yml-brightgreen?logo=files&logoColor=ffffff)
 
 ```yaml
+#########################################################################################################
+#    Plugin now supports full hex color codes.                                                          #
+#    You can use https://www.birdflop.com/resources/rgb/ to create your colors                          #
+#    Developer; padrewin || Cold Development                                                            #
+#    GitHub; https://github.com/padrewin || https://github.com/Cold-Development                         #
+#    Links: https://colddev.dev || https://discord.colddev.dev                                          #
+#########################################################################################################
+
 prefix: "&8「&#6E00A5W&#760EAEe&#7D1CB7l&#8529C0c&#8D37C9o&#9545D2m&#9C53DBe&#A461E4H&#AC6EEDe&#B37CF6a&#BB8AFFd&8」&7» &f"
 
 # Spaces = clean the chat before giving the text (for player only)
@@ -15,7 +23,7 @@ Spaces-Top: 2
 Spaces-Bot: 0
 
 # Time when you want the message to appear (in seconds)
-Timer: 3
+Timer: 5
 
 # ----------------- First time join -----------------------------
 
@@ -45,13 +53,13 @@ Players-FirstJoin:
 # You need something when the player spawns?
 # Put your commands without "/"
 Commands-First:
-  - ""
+  - say WELCOME
 
 # Need a Sound when the player joins for the first time?
 # Sounds : https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
 SoundA:
   enable: true
-  sound: ENTITY_VILLAGER_CELEBRATE
+  sound: ENTITY_GOAT_SCREAMING_DEATH
   # Values: 0.0 -> 1.0
   volume: 1.0
   # Values: 0.0 -> 1.0
@@ -89,7 +97,8 @@ Players-Back:
 
 # You need something when the player spawns?
 # Put your commands without "/"
-Commands-Back: []
+Commands-Back:
+  - say WELCOME BACK
 
 # Need a Sound when the player joins again?
 # Sounds : https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
