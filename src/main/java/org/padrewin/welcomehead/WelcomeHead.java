@@ -44,9 +44,9 @@ if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
   getCommand("welcomehead").setExecutor((CommandExecutor)new Commands());
 
   Bukkit.getPluginManager().registerEvents((Listener)new JoinEvent(), (Plugin)this);
-  prefix = Utils.translateHexColorCodes("&#", "", getConfig().getString("prefix") + " ");
+  prefix = Utils.translateColors(getConfig().getString("prefix") + " ");
 
-    }
+}
     else {
 
   getLogger().info("-------- WelcomeHead ---------");
