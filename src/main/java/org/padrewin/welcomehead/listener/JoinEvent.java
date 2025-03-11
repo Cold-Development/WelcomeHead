@@ -112,7 +112,7 @@ public class JoinEvent implements Listener {
 
         // Try to load the player's avatar from the website
         try {
-            imageToSend = ImageIO.read(new URL("https://minotar.net/avatar/" + player.getName() + "/8.png"));
+            imageToSend = ImageIO.read(new URL("https://minotar.net/avatar/" + player.getName() + "/8.png?ts=" + System.currentTimeMillis()));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
