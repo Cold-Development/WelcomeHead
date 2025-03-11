@@ -1,12 +1,40 @@
 name: WelcomeHead
-version: '${project.version}'
+version: '@version@'
 main: org.padrewin.welcomehead.WelcomeHead
 author: padrewin
 api-version: '1.20'
-description: A plugin that shows player's head with a welcome message on server join.
+description: A plugin that shows a player's head with a welcome message on server join.
 depend: [PlaceholderAPI]
 commands:
   welcomehead:
-    description: The main command.
+    description: Main command for WelcomeHead.
     aliases: [wh]
     permission: welcomehead.use
+    permission-message: You do not have permission to use WelcomeHead.
+  version:
+    description: Displays the plugin version.
+    permission: welcomehead.version
+    permission-message: You do not have permission to view the version.
+  help:
+    description: Displays the help message.
+    permission: welcomehead.help
+    permission-message: You do not have permission to view help.
+  reload:
+    description: Reloads the WelcomeHead configuration.
+    permission: welcomehead.reload
+    permission-message: You do not have permission to reload WelcomeHead.
+
+permissions:
+  welcomehead.*:
+    description: Root command for WelcomeHead plugin
+    children:
+      welcomehead.version: true
+      coldtracker.reload: true
+
+  welcomehead.version:
+    description: Gives access to the version command
+    default: true
+
+  welcomehead.reload:
+    description: Gives access to the reload command
+    default: op

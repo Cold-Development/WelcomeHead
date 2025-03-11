@@ -1,0 +1,24 @@
+# Plugin prefix
+prefix: '&8「&#6E00A5W&#760EAEe&#7D1CB7l&#8529C0c&#8D37C9o&#9545D2m&#9C53DBe&#A461E4H&#AC6EEDe&#B37CF6a&#BB8AFFd&8」&7» &f'
+
+# Help Command
+command-help-description: '&8 - &c/welcomehead help &7- 显示帮助菜单... 您已到达'
+command-help-title: '&c可用命令:'
+
+# Misc
+no-permission: '&c您没有权限执行此操作！'
+unknown-command: '&c未知命令 &4%input%&c.'
+invalid-command-usage: '&c命令使用无效.'
+player-not-found: '&7未找到玩家：&c{player}&7.'
+
+# Base Command Message
+base-command-color: '&7'
+base-command-help: '&7使用 &c/welcomehead help &7获取命令信息.'
+
+# Reload Command
+command-reload-description: '&8 - &c/welcomehead reload &7- 重新加载插件'
+command-reload-usage: '&7用法：&c/welcomehead reload'
+command-reload-success: '&7配置和语言文件已重新加载.'
+
+# Version Command
+command-version-description: '&8 - &c/welcomehead version &7- 显示 welcomehead 插件的版本信息'

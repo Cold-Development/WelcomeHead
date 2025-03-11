@@ -1,50 +1,68 @@
 package org.padrewin.welcomehead;
 
-import org.padrewin.welcomehead.Utils.Utils;
-import org.padrewin.welcomehead.commands.Commands;
+import dev.padrewin.colddev.ColdPlugin;
+import dev.padrewin.colddev.config.ColdSetting;
+import dev.padrewin.colddev.manager.Manager;
+import dev.padrewin.colddev.manager.PluginUpdateManager;
 import org.padrewin.welcomehead.listener.JoinEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.padrewin.welcomehead.manager.CommandManager;
+import org.padrewin.welcomehead.manager.LocaleManager;
+import org.padrewin.welcomehead.settings.SettingKey;
 
-public class WelcomeHead extends JavaPlugin {
+import java.io.File;
+import java.util.List;
+
+public final class WelcomeHead extends ColdPlugin {
+
+  /**
+   * Console colors
+   */
+  String ANSI_RESET = "\u001B[0m";
+  String ANSI_CHINESE_PURPLE = "\u001B[38;5;93m";
+  String ANSI_PURPLE = "\u001B[35m";
+  String ANSI_GREEN = "\u001B[32m";
+  String ANSI_RED = "\u001B[31m";
+  String ANSI_AQUA = "\u001B[36m";
+  String ANSI_PINK = "\u001B[35m";
+  String ANSI_YELLOW = "\u001B[33m";
+
+
   public static WelcomeHead instance;
-  public static String prefix;
 
   public WelcomeHead() {
-instance = this;
+    super("Cold-Development", "WelcomeHead", 25064, null, LocaleManager.class, null);
+    instance = this;
   }
 
-
-  public static WelcomeHead getInstance() {
-return instance;
-  }
-
-  public void onEnable() {
+  public void enable() {
+    instance = this;
 if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
 
+  getManager(PluginUpdateManager.class);
 
   String name = getDescription().getName();
   getLogger().info("");
-  getLogger().info("  ____ ___  _     ____  ");
-  getLogger().info(" / ___/ _ \\| |   |  _ \\ ");
-  getLogger().info("| |  | | | | |   | | | |");
-  getLogger().info("| |__| |_| | |___| |_| |");
-  getLogger().info(" \\____\\___/|_____|____/");
-  getLogger().info("    " + name + " v" + getDescription().getVersion());
-  getLogger().info("    Author(s): " + (String)getDescription().getAuthors().get(0));
-  getLogger().info("    (c) Cold Development. All rights reserved.");
+  getLogger().info(ANSI_CHINESE_PURPLE + "  ____ ___  _     ____  " + ANSI_RESET);
+  getLogger().info(ANSI_PINK + " / ___/ _ \\| |   |  _ \\ " + ANSI_RESET);
+  getLogger().info(ANSI_CHINESE_PURPLE + "| |  | | | | |   | | | |" + ANSI_RESET);
+  getLogger().info(ANSI_PINK + "| |__| |_| | |___| |_| |" + ANSI_RESET);
+  getLogger().info(ANSI_CHINESE_PURPLE + " \\____\\___/|_____|____/ " + ANSI_RESET);
+  getLogger().info("    " + ANSI_GREEN + name + ANSI_RED + " v" + getDescription().getVersion() + ANSI_RESET);
+  getLogger().info(ANSI_PURPLE + "    Author(s): " + ANSI_PURPLE + getDescription().getAuthors().get(0) + ANSI_RESET);
+  getLogger().info(ANSI_AQUA + "    (c) Cold Development ❄" + ANSI_RESET);
   getLogger().info("");
 
 
+  File configFile = new File(getDataFolder(), "en_US.yml");
+  if (!configFile.exists()) {
+    saveDefaultConfig();
+  }
+
   saveDefaultConfig();
 
-  getCommand("welcomehead").setExecutor((CommandExecutor)new Commands());
-
-  Bukkit.getPluginManager().registerEvents((Listener)new JoinEvent(), (Plugin)this);
-  prefix = Utils.translateColors(getConfig().getString("prefix") + " ");
+  Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
 
 }
     else {
@@ -60,13 +78,50 @@ if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
   getLogger().info("------------------------------");
   Bukkit.getPluginManager().disablePlugin((Plugin)this);
     }
+
   }
 
-  public void onDisable() {
-getLogger().info("-------- WelcomeHead ---------");
-getLogger().info(" ");
-getLogger().info("Disabling the plugin...");
-getLogger().info(" ");
-getLogger().info("------------------------------");
+  public void disable() {
+    getLogger().info("");
+    getLogger().info(ANSI_CHINESE_PURPLE + "WelcomeHead disabled." + ANSI_RESET);
+    getLogger().info("");
+    }
+
+  @Override
+  public void reload() {
+    super.reload();
   }
+
+  @Override
+  protected List<Class<? extends Manager>> getManagerLoadPriority() {
+    return List.of(
+            CommandManager.class
+    );
+  }
+
+  @Override
+  protected List<ColdSetting<?>> getColdConfigSettings() {
+    return SettingKey.getKeys();
+  }
+
+  @Override
+  protected String[] getColdConfigHeader() {
+    return new String[] {
+            " ██████╗ ██████╗ ██╗     ██████╗ ",
+            "██╔════╝██╔═══██╗██║     ██╔══██╗",
+            "██║     ██║   ██║██║     ██║  ██║",
+            "██║     ██║   ██║██║     ██║  ██║",
+            "╚██████╗╚██████╔╝███████╗██████╔╝",
+            " ╚═════╝ ╚═════╝ ╚══════╝╚═════╝ ",
+            "                                 "
+    };
+  }
+
+  public static WelcomeHead getInstance() {
+    if (instance == null) {
+      throw new IllegalStateException("WelcomeHead instance is not initialized!");
+    }
+    return instance;
+  }
+
 }

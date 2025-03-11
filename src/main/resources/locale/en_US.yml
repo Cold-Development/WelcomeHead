@@ -1,0 +1,24 @@
+# Plugin prefix
+prefix: '&8「&#6E00A5W&#760EAEe&#7D1CB7l&#8529C0c&#8D37C9o&#9545D2m&#9C53DBe&#A461E4H&#AC6EEDe&#B37CF6a&#BB8AFFd&8」&7» &f'
+
+# Help Command
+command-help-description: '&8 - &c/welcomehead help &7- Displays the help menu... You have arrived'
+command-help-title: '&cAvailable Commands:'
+
+# Misc
+no-permission: '&cYou don''t have permission for that!'
+unknown-command: '&cUnknown command &4%input%&c.'
+invalid-command-usage: '&cInvalid command usage.'
+player-not-found: '&7Player could not be found: &c{player}&7.'
+
+# Base Command Message
+base-command-color: '&7'
+base-command-help: '&7Use &c/welcomehead help &7for command information.'
+
+# Reload Command
+command-reload-description: '&8 - &c/welcomehead reload &7- Reloads the plugin'
+command-reload-usage: '&7Usage: &c/welcomehead reload'
+command-reload-success: '&7Configuration and locale files were reloaded.'
+
+# Version Command
+command-version-description: '&8 - &c/welcomehead version &7- Display the version info for welcomehead'

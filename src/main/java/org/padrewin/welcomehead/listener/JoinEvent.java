@@ -9,6 +9,7 @@ import org.padrewin.welcomehead.WelcomeHead;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import javax.imageio.ImageIO;
 
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -101,19 +102,48 @@ public class JoinEvent implements Listener {
 
 
     private void sendEmptySpaces(Player player, int spaces) {
-        for (int i = 0; i <= spaces; i++) {
+        for (int i = 0; i < spaces; i++) {
             player.sendMessage(" ");
         }
     }
 
     private void sendImageMessage(Player player, String configPath) {
+        BufferedImage imageToSend = null;
+
+        // Try to load the player's avatar from the website
         try {
-            BufferedImage imageToSend = ImageIO.read(new URL("https://minotar.net/avatar/" + player.getName() + "/8.png"));
+            imageToSend = ImageIO.read(new URL("https://minotar.net/avatar/" + player.getName() + "/8.png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        // If the player's avatar didn't load, try loading the default (Steve) avatar online
+        if (imageToSend == null) {
+            WelcomeHead.getInstance().getLogger().warning("Failed to load avatar for " + player.getName() + ". Attempting to load the default (Steve) avatar online.");
+            try {
+                imageToSend = ImageIO.read(new URL("https://minotar.net/avatar/Steve/8.png"));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        // If still unsuccessful, try loading a local default avatar image (ensure 'default_avatar.png' is included in your plugin resources)
+        if (imageToSend == null) {
+            WelcomeHead.getInstance().getLogger().warning("Failed to load the default online avatar. Attempting to load a local default avatar.");
+            try {
+                imageToSend = ImageIO.read(Objects.requireNonNull(WelcomeHead.getInstance().getResource("default_avatar.png")));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        // If the image was loaded successfully, send the image message; otherwise, notify the player
+        if (imageToSend != null) {
             new ImageMessage(imageToSend, 8, ImageChar.BLOCK.getChar())
                     .appendText(getColoredText(player, configPath))
                     .sendToPlayer(player);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } else {
+            player.sendMessage("Failed to load your avatar and the default avatar is also unavailable.");
         }
     }
 
@@ -121,10 +151,15 @@ public class JoinEvent implements Listener {
         String[] textLines = new String[8];
         for (int i = 1; i <= 8; i++) {
             String line = WelcomeHead.getInstance().getConfig().getString(configPath + "." + i);
+            if (line == null) {
+                WelcomeHead.getInstance().getLogger().severe("Missing config for " + configPath + "." + i + ". Using an empty string.");
+                line = "";
+            }
             textLines[i - 1] = PlaceholderAPI.setPlaceholders(player, Utils.translateColors(line));
         }
         return textLines;
     }
+
 
     private void playEffectsAndCommands(Player player, String soundConfig, String commandsConfig, String errorMsg) {
         Utils.soundActivated(player,

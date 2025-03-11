@@ -1,0 +1,24 @@
+# Plugin prefix
+prefix: '&8「&#6E00A5W&#760EAEe&#7D1CB7l&#8529C0c&#8D37C9o&#9545D2m&#9C53DBe&#A461E4H&#AC6EEDe&#B37CF6a&#BB8AFFd&8」&7» &f'
+
+# Help Command
+command-help-description: '&8 - &c/welcomehead help &7- Afișează meniul de ajutor... Ai ajuns'
+command-help-title: '&cComenzi disponibile:'
+
+# Misc
+no-permission: '&cNu ai permisiunea necesară pentru asta!'
+unknown-command: '&cComandă necunoscută &4%input%&c.'
+invalid-command-usage: '&cUtilizare incorectă a comenzii.'
+player-not-found: '&7Jucătorul nu a fost găsit: &c{player}&7.'
+
+# Base Command Message
+base-command-color: '&7'
+base-command-help: '&7Folosește &c/welcomehead help &7pentru informații despre comenzi.'
+
+# Reload Command
+command-reload-description: '&8 - &c/welcomehead reload &7- Reîncarcă pluginul'
+command-reload-usage: '&7Utilizare: &c/welcomehead reload'
+command-reload-success: '&7Configurația și fișierele de localizare au fost reîncărcate.'
+
+# Version Command
+command-version-description: '&8 - &c/welcomehead version &7- Afișează informațiile despre versiune pentru plugin'
