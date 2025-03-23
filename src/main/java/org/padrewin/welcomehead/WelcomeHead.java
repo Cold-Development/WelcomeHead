@@ -2,8 +2,11 @@ package org.padrewin.welcomehead;
 
 import dev.padrewin.colddev.ColdPlugin;
 import dev.padrewin.colddev.config.ColdSetting;
+import dev.padrewin.colddev.database.DatabaseConnector;
+import dev.padrewin.colddev.database.SQLiteConnector;
 import dev.padrewin.colddev.manager.Manager;
 import dev.padrewin.colddev.manager.PluginUpdateManager;
+import org.padrewin.welcomehead.database.DatabaseManager;
 import org.padrewin.welcomehead.listener.JoinEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -35,9 +38,17 @@ public final class WelcomeHead extends ColdPlugin {
     super("Cold-Development", "WelcomeHead", 25064, null, LocaleManager.class, null);
     instance = this;
   }
+  private DatabaseManager databaseManager;
 
   public void enable() {
     instance = this;
+
+    // Initialize DatabaseManager
+    databaseManager = new DatabaseManager(this, "welcomehead.db");
+    DatabaseConnector connector = new SQLiteConnector(this);
+    String databasePath = connector.getDatabasePath();
+    getLogger().info(ANSI_GREEN + "Database path: " + ANSI_YELLOW + databasePath + ANSI_RESET);
+
 if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
 
   getManager(PluginUpdateManager.class);
@@ -82,6 +93,9 @@ if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
   }
 
   public void disable() {
+    if (databaseManager != null) {
+      databaseManager.closeConnection();
+    }
     getLogger().info("");
     getLogger().info(ANSI_CHINESE_PURPLE + "WelcomeHead disabled." + ANSI_RESET);
     getLogger().info("");
@@ -115,6 +129,10 @@ if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             " ╚═════╝ ╚═════╝ ╚══════╝╚═════╝ ",
             "                                 "
     };
+  }
+
+  public DatabaseManager getDatabaseManager() {
+    return databaseManager;
   }
 
   public static WelcomeHead getInstance() {
