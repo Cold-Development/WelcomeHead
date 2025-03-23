@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import javax.imageio.ImageIO;
 
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -19,6 +21,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
+import org.padrewin.welcomehead.database.DatabaseManager;
 
 public class JoinEvent implements Listener {
 
@@ -108,43 +111,77 @@ public class JoinEvent implements Listener {
     }
 
     private void sendImageMessage(Player player, String configPath) {
-        BufferedImage imageToSend = null;
+        // Obține instanța DatabaseManager din plugin
+        DatabaseManager dbManager = WelcomeHead.getInstance().getDatabaseManager();
+        UUID playerUUID = player.getUniqueId();
+        String playerName = player.getName();
 
-        // Try to load the player's avatar from the website
-        try {
-            imageToSend = ImageIO.read(new URL("https://minotar.net/avatar/" + player.getName() + "/8.png?ts=" + System.currentTimeMillis()));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        // Obține avatarul din cache (dacă există)
+        CompletableFuture<BufferedImage> cachedFuture = dbManager.getCachedAvatar(playerUUID);
 
-        // If the player's avatar didn't load, try loading the default (Steve) avatar online
-        if (imageToSend == null) {
-            WelcomeHead.getInstance().getLogger().warning("Failed to load avatar for " + player.getName() + ". Attempting to load the default (Steve) avatar online.");
+        // Descarcă avatarul actual de pe Minotar în mod asincron
+        CompletableFuture<BufferedImage> downloadFuture = CompletableFuture.supplyAsync(() -> {
+            BufferedImage downloadedImage = null;
             try {
-                imageToSend = ImageIO.read(new URL("https://minotar.net/avatar/Steve/8.png"));
+                downloadedImage = ImageIO.read(new URL("https://minotar.net/avatar/" + playerName + "/8.png?ts=" + System.currentTimeMillis()));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
+            return downloadedImage;
+        });
 
-        // If still unsuccessful, try loading a local default avatar image (ensure 'default_avatar.png' is included in your plugin resources)
-        if (imageToSend == null) {
-            WelcomeHead.getInstance().getLogger().warning("Failed to load the default online avatar. Attempting to load a local default avatar.");
-            try {
-                imageToSend = ImageIO.read(Objects.requireNonNull(WelcomeHead.getInstance().getResource("default_avatar.png")));
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        // Combină rezultatele fără a bloca, folosind thenCompose
+        CompletableFuture<BufferedImage> finalImageFuture = downloadFuture.thenCompose(downloaded -> {
+            if (downloaded != null) {
+                String newHash = DatabaseManager.computeImageHash(downloaded);
+                return cachedFuture.thenCompose(cached -> {
+                    if (cached != null) {
+                        return dbManager.isAvatarUpdated(playerUUID, newHash).thenApply(isUpdated -> {
+                            if (isUpdated) {
+                                // Dacă skin-ul s-a schimbat, actualizează cache-ul și folosește imaginea descărcată
+                                dbManager.storeAvatarInCache(playerUUID, playerName, downloaded);
+                                return downloaded;
+                            } else {
+                                // Dacă nu s-a schimbat, folosește avatarul din cache
+                                return cached;
+                            }
+                        });
+                    } else {
+                        // Nu există avatar în cache, deci stochează imaginea descărcată
+                        dbManager.storeAvatarInCache(playerUUID, playerName, downloaded);
+                        return CompletableFuture.completedFuture(downloaded);
+                    }
+                });
+            } else {
+                // Dacă descărcarea a eșuat, încearcă să folosești avatarul din cache
+                return cachedFuture.thenApply(cached -> {
+                    if (cached != null) {
+                        return cached;
+                    } else {
+                        // Ca fallback, încarcă avatarul local default
+                        try {
+                            return ImageIO.read(Objects.requireNonNull(WelcomeHead.getInstance().getResource("default_avatar.png")));
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            return null;
+                        }
+                    }
+                });
             }
-        }
+        });
 
-        // If the image was loaded successfully, send the image message; otherwise, notify the player
-        if (imageToSend != null) {
-            new ImageMessage(imageToSend, 8, ImageChar.BLOCK.getChar())
-                    .appendText(getColoredText(player, configPath))
-                    .sendToPlayer(player);
-        } else {
-            player.sendMessage("Failed to load your avatar and the default avatar is also unavailable.");
-        }
+        // Odată ce avem imaginea finală, revenim pe thread-ul principal pentru a interacționa cu API-ul Bukkit
+        finalImageFuture.thenAccept(imageToSend -> {
+            Bukkit.getScheduler().runTask(WelcomeHead.getInstance(), () -> {
+                if (imageToSend != null) {
+                    new ImageMessage(imageToSend, 8, ImageChar.BLOCK.getChar())
+                            .appendText(getColoredText(player, configPath))
+                            .sendToPlayer(player);
+                } else {
+                    player.sendMessage("Failed to load your avatar and the default avatar is also unavailable.");
+                }
+            });
+        });
     }
 
     private String[] getColoredText(Player player, String configPath) {
