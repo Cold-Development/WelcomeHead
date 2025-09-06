@@ -28,69 +28,69 @@ public class JoinEvent implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(final PlayerJoinEvent e) throws IOException {
         final Player player = e.getPlayer();
-        final int spaceTop = WelcomeHead.getInstance().getConfig().getInt("Spaces-Top");
-        final int spacesBot = WelcomeHead.getInstance().getConfig().getInt("Spaces-Bot");
+        // Read config values with names matching their actual behavior in Minecraft chat
+        final int spacesBeforeText = WelcomeHead.getInstance().getConfig().getInt("Spaces-Top");
+        final int spacesAfterText = WelcomeHead.getInstance().getConfig().getInt("Spaces-Bot");
 
         if (!player.hasPlayedBefore()) {
-            // Este primul login al jucătorului
+            // First login
             Bukkit.getScheduler().scheduleSyncDelayedTask((Plugin) WelcomeHead.getInstance(), new Runnable() {
                 public void run() {
-                    handleFirstJoin(player, spaceTop, spacesBot);
+                    handleFirstJoin(player, spacesBeforeText, spacesAfterText);
                 }
             }, WelcomeHead.getInstance().getConfig().getInt("Timer") * 20L);
         } else {
-            // Este un rejoin al jucătorului
+            // Returning player
             Bukkit.getScheduler().scheduleSyncDelayedTask((Plugin) WelcomeHead.getInstance(), new Runnable() {
                 public void run() {
-                    handleBackJoin(player, spaceTop, spacesBot);
+                    handleBackJoin(player, spacesBeforeText, spacesAfterText);
                 }
             }, WelcomeHead.getInstance().getConfig().getInt("Timer") * 20L);
         }
     }
 
-
-    private void handleFirstJoin(Player player, int spaceTop, int spacesBot) {
-        if (WelcomeHead.getInstance().getConfig().getBoolean("Players-FirstJoin.enable")) {
-            sendEmptySpaces(player, spaceTop);
-            sendImageMessage(player, "Players-FirstJoin.head-text");
-            sendEmptySpaces(player, spacesBot);
-        } else {
-            Utils.headNotActivated(player,
-                    WelcomeHead.getInstance().getConfig().getStringList("Players-FirstJoin.no-head-text"),
-                    WelcomeHead.getInstance().getConfig().getBoolean("Players-FirstJoin.center"));
+    private void handleFirstJoin(Player player, int spacesBeforeText, int spacesAfterText) {
+        if (!WelcomeHead.getInstance().getConfig().getBoolean("Players-FirstJoin.enable")) {
+            return; // do nothing
         }
 
-        // Focuri de artificii
+        // read from config
+        boolean showHead = WelcomeHead.getInstance().getConfig().getBoolean("Players-FirstJoin.showHead");
+        boolean center   = WelcomeHead.getInstance().getConfig().getBoolean("Players-FirstJoin.center");
+        String configPath = "Players-FirstJoin.head-text";
+
+        // Send welcome message with appropriate spacing
+        sendWelcomeMessage(player, configPath, showHead, center, spacesBeforeText, spacesAfterText);
+
+        // Fireworks, sound, commands, etc.
         int fireworkAmount = WelcomeHead.getInstance().getConfig().getInt("Firework.amount");
         Utils.spawnFireworks(player.getLocation(), fireworkAmount);
 
-        // Sunete pentru primul login (apelează după artificii)
         Utils.soundActivated(player,
                 WelcomeHead.getInstance().getConfig().getBoolean("SoundA.enable"),
                 WelcomeHead.getInstance().getConfig().getString("SoundA.sound"),
                 WelcomeHead.getInstance().getConfig().getDouble("SoundA.volume"),
                 WelcomeHead.getInstance().getConfig().getDouble("SoundA.pitch"));
 
-        // Comenzi pentru primul login
         Utils.commandsActivated(player,
                 WelcomeHead.getInstance().getConfig().getStringList("Commands-First"),
                 "Something is weird with your command -> First player");
     }
 
-
-
-    private void handleBackJoin(Player player, int spaceTop, int spacesBot) {
-        if (WelcomeHead.getInstance().getConfig().getBoolean("Players-Back.enable")) {
-            sendEmptySpaces(player, spaceTop);
-            sendImageMessage(player, "Players-Back.head-text");
-            sendEmptySpaces(player, spacesBot);
-        } else {
-            Utils.headNotActivated(player,
-                    WelcomeHead.getInstance().getConfig().getStringList("Players-Back.no-head-text"),
-                    WelcomeHead.getInstance().getConfig().getBoolean("Players-Back.center"));
+    private void handleBackJoin(Player player, int spacesBeforeText, int spacesAfterText) {
+        if (!WelcomeHead.getInstance().getConfig().getBoolean("Players-Back.enable")) {
+            return; // do nothing
         }
 
-        // Sunete pentru rejoin
+        // read from config
+        boolean showHead = WelcomeHead.getInstance().getConfig().getBoolean("Players-Back.showHead");
+        boolean center   = WelcomeHead.getInstance().getConfig().getBoolean("Players-Back.center");
+        String configPath = "Players-Back.head-text";
+
+        // Send welcome message with appropriate spacing
+        sendWelcomeMessage(player, configPath, showHead, center, spacesBeforeText, spacesAfterText);
+
+        // Sounds, commands, etc.
         Utils.soundActivated(player,
                 WelcomeHead.getInstance().getConfig().getBoolean("SoundB.enable"),
                 WelcomeHead.getInstance().getConfig().getString("SoundB.sound"),
@@ -100,37 +100,60 @@ public class JoinEvent implements Listener {
         Utils.commandsActivated(player,
                 WelcomeHead.getInstance().getConfig().getStringList("Commands-Back"),
                 "Something is weird with your command -> Back player");
-
     }
 
-
-    private void sendEmptySpaces(Player player, int spaces) {
-        for (int i = 0; i < spaces; i++) {
-            player.sendMessage(" ");
+    /**
+     * Sends a welcome message to the player with appropriate spacing
+     */
+    private void sendWelcomeMessage(Player player, String configPath, boolean showHead, boolean center,
+                                    int spacesBeforeText, int spacesAfterText) {
+        // 1) Retrieve the 8 lines from the config
+        String[] lines = new String[8];
+        for (int i = 1; i <= 8; i++) {
+            String line = WelcomeHead.getInstance().getConfig().getString(configPath + "." + i, "");
+            line = PlaceholderAPI.setPlaceholders(player, Utils.translateColors(line));
+            lines[i - 1] = line;
         }
-    }
 
-    private void sendImageMessage(Player player, String configPath) {
-        // Obține instanța DatabaseManager din plugin
+        // 2) Center lines if needed
+        if (center) {
+            lines = Utils.centerLines(lines, 50);
+        }
+
+        // 3) If we're not showing head avatar, just send the text with spaces
+        if (!showHead) {
+            // Send spaces before (above) the message
+            for (int i = 0; i < spacesBeforeText; i++) {
+                player.sendMessage(" ");
+            }
+
+            // Send the actual message lines
+            for (String line : lines) {
+                player.sendMessage(line);
+            }
+
+            // Send spaces after (below) the message
+            for (int i = 0; i < spacesAfterText; i++) {
+                player.sendMessage(" ");
+            }
+            return;
+        }
+
+        // 4) If showing head avatar, need to handle async image loading
         DatabaseManager dbManager = WelcomeHead.getInstance().getDatabaseManager();
         UUID playerUUID = player.getUniqueId();
         String playerName = player.getName();
 
-        // Obține avatarul din cache (dacă există)
         CompletableFuture<BufferedImage> cachedFuture = dbManager.getCachedAvatar(playerUUID);
-
-        // Descarcă avatarul actual de pe Minotar în mod asincron
         CompletableFuture<BufferedImage> downloadFuture = CompletableFuture.supplyAsync(() -> {
-            BufferedImage downloadedImage = null;
             try {
-                downloadedImage = ImageIO.read(new URL("https://minotar.net/avatar/" + playerName + "/8.png?ts=" + System.currentTimeMillis()));
+                return ImageIO.read(new URL("https://minotar.net/avatar/" + playerName + "/128.png?ts=" + System.currentTimeMillis()));
             } catch (IOException ex) {
                 ex.printStackTrace();
+                return null;
             }
-            return downloadedImage;
         });
 
-        // Combină rezultatele fără a bloca, folosind thenCompose
         CompletableFuture<BufferedImage> finalImageFuture = downloadFuture.thenCompose(downloaded -> {
             if (downloaded != null) {
                 String newHash = DatabaseManager.computeImageHash(downloaded);
@@ -138,27 +161,22 @@ public class JoinEvent implements Listener {
                     if (cached != null) {
                         return dbManager.isAvatarUpdated(playerUUID, newHash).thenApply(isUpdated -> {
                             if (isUpdated) {
-                                // Dacă skin-ul s-a schimbat, actualizează cache-ul și folosește imaginea descărcată
                                 dbManager.storeAvatarInCache(playerUUID, playerName, downloaded);
                                 return downloaded;
                             } else {
-                                // Dacă nu s-a schimbat, folosește avatarul din cache
                                 return cached;
                             }
                         });
                     } else {
-                        // Nu există avatar în cache, deci stochează imaginea descărcată
                         dbManager.storeAvatarInCache(playerUUID, playerName, downloaded);
                         return CompletableFuture.completedFuture(downloaded);
                     }
                 });
             } else {
-                // Dacă descărcarea a eșuat, încearcă să folosești avatarul din cache
                 return cachedFuture.thenApply(cached -> {
                     if (cached != null) {
                         return cached;
                     } else {
-                        // Ca fallback, încarcă avatarul local default
                         try {
                             return ImageIO.read(Objects.requireNonNull(WelcomeHead.getInstance().getResource("default_avatar.png")));
                         } catch (IOException ex) {
@@ -170,43 +188,47 @@ public class JoinEvent implements Listener {
             }
         });
 
-        // Odată ce avem imaginea finală, revenim pe thread-ul principal pentru a interacționa cu API-ul Bukkit
-        finalImageFuture.thenAccept(imageToSend -> {
+        // 5) Once we have the final image, display everything in correct order
+        final int finalSpacesBeforeText = spacesBeforeText;
+        final int finalSpacesAfterText = spacesAfterText;
+        final String[] finalLines = lines;
+
+        finalImageFuture.thenAccept(image -> {
             Bukkit.getScheduler().runTask(WelcomeHead.getInstance(), () -> {
-                if (imageToSend != null) {
-                    new ImageMessage(imageToSend, 8, ImageChar.BLOCK.getChar())
-                            .appendText(getColoredText(player, configPath))
-                            .sendToPlayer(player);
-                } else {
-                    player.sendMessage("Failed to load your avatar and the default avatar is also unavailable.");
+                if (image == null) {
+                    // If everything fails, just send lines without image
+                    // Send spaces before text
+                    for (int i = 0; i < finalSpacesBeforeText; i++) {
+                        player.sendMessage(" ");
+                    }
+
+                    // Send message
+                    for (String line : finalLines) {
+                        player.sendMessage(line);
+                    }
+
+                    // Send spaces after text
+                    for (int i = 0; i < finalSpacesAfterText; i++) {
+                        player.sendMessage(" ");
+                    }
+                    return;
+                }
+
+                // Send spaces before text
+                for (int i = 0; i < finalSpacesBeforeText; i++) {
+                    player.sendMessage(" ");
+                }
+
+                // Build and send the ImageMessage with text
+                new ImageMessage(image, 8, ImageChar.BLOCK.getChar())
+                        .appendText(finalLines)
+                        .sendToPlayer(player);
+
+                // Send spaces after text
+                for (int i = 0; i < finalSpacesAfterText; i++) {
+                    player.sendMessage(" ");
                 }
             });
         });
-    }
-
-    private String[] getColoredText(Player player, String configPath) {
-        String[] textLines = new String[8];
-        for (int i = 1; i <= 8; i++) {
-            String line = WelcomeHead.getInstance().getConfig().getString(configPath + "." + i);
-            if (line == null) {
-                WelcomeHead.getInstance().getLogger().severe("Missing config for " + configPath + "." + i + ". Using an empty string.");
-                line = "";
-            }
-            textLines[i - 1] = PlaceholderAPI.setPlaceholders(player, Utils.translateColors(line));
-        }
-        return textLines;
-    }
-
-
-    private void playEffectsAndCommands(Player player, String soundConfig, String commandsConfig, String errorMsg) {
-        Utils.soundActivated(player,
-                WelcomeHead.getInstance().getConfig().getBoolean(soundConfig + ".enable"),
-                WelcomeHead.getInstance().getConfig().getString(soundConfig + ".sound"),
-                WelcomeHead.getInstance().getConfig().getDouble(soundConfig + ".volume"),
-                WelcomeHead.getInstance().getConfig().getDouble(soundConfig + ".pitch"));
-        Utils.spawnFireworks(player.getLocation(), WelcomeHead.getInstance().getConfig().getInt("Firework.amount"));
-        Utils.commandsActivated(player,
-                WelcomeHead.getInstance().getConfig().getStringList(commandsConfig),
-                "Something is weird with your command -> " + errorMsg);
     }
 }

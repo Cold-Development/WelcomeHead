@@ -8,13 +8,26 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.padrewin.welcomehead.WelcomeHead;
+
 import static dev.padrewin.colddev.config.ColdSettingSerializers.*;
 
 public class SettingKey {
 
     private static final List<ColdSetting<?>> KEYS = new ArrayList<>();
 
-    // Redirect base command: Which command should be used when '/welcomehead' is executed without subcommands.
+    // --------------------------------------------------------------
+    //  locale
+    // --------------------------------------------------------------
+    public static final ColdSetting<String> LOCALE = create(
+            "locale",
+            STRING,
+            "en_US",
+            "The locale to use in the /locale folder"
+    );
+
+    // --------------------------------------------------------------
+    //  base-command-redirect
+    // --------------------------------------------------------------
     public static final ColdSetting<String> BASE_COMMAND_REDIRECT = create(
             "base-command-redirect",
             STRING,
@@ -25,22 +38,21 @@ public class SettingKey {
             "If left blank, the default behavior of showing '/welcomehead version' with bypassed permissions will be used"
     );
 
-    // Clean the chat before giving the text (for player only)
+    // --------------------------------------------------------------
+    //  Spaces (clean chat) & Timer
+    // --------------------------------------------------------------
     public static final ColdSetting<Integer> SPACES_TOP = create(
             "Spaces-Top",
             INTEGER,
-            0,
+            1,
             "Spaces = clean the chat before giving the text (for player only)"
     );
-    // Clean the chat after giving the text (for player only)
     public static final ColdSetting<Integer> SPACES_BOT = create(
             "Spaces-Bot",
             INTEGER,
-            0,
+            1,
             "Spaces = clean the chat after giving the text (for player only)"
     );
-
-    // Time when you want the message to appear (in seconds)
     public static final ColdSetting<Integer> TIMER = create(
             "Timer",
             INTEGER,
@@ -48,90 +60,98 @@ public class SettingKey {
             "Time when you want the message to appear (in seconds)"
     );
 
-    // ----------------- First time join -----------------------------
-    // Face the new players! Change the texts made available to you.
+    // --------------------------------------------------------------
+    //  Players-FirstJoin
+    // --------------------------------------------------------------
+    public static final ColdSetting<CommentedConfigurationSection> PLAYERS_FIRSTJOIN_SECTION = create(
+            "Players-FirstJoin",
+            "First Join Player Settings",
+            "", // Blank line before section
+            ""  // Double blank line for more spacing
+    );
+
     public static final ColdSetting<Boolean> PLAYERS_FIRSTJOIN_ENABLE = create(
             "Players-FirstJoin.enable",
             BOOLEAN,
             true,
             "Face the new players! Enable the head message for first join."
     );
-    // Head-text for first join (if the head is enabled)
-    // If you need to have the head of the player put "enable: true"
+
+    // showHead: whether to display the player's head for first join
+    public static final ColdSetting<Boolean> PLAYERS_FIRSTJOIN_SHOWHEAD = create(
+            "Players-FirstJoin.showHead",
+            BOOLEAN,
+            true, // Adjust if you want true by default
+            "If you need the player's head, set this to true."
+    );
+
+    // Lines for the player's head-text
     public static final ColdSetting<String> PLAYERS_FIRSTJOIN_HEAD_TEXT_1 = create(
             "Players-FirstJoin.head-text.1",
             STRING,
             "",
-            "Line 1 of the head message for first join (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_FIRSTJOIN_HEAD_TEXT_2 = create(
             "Players-FirstJoin.head-text.2",
             STRING,
             "",
-            "Line 2 of the head message for first join (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_FIRSTJOIN_HEAD_TEXT_3 = create(
             "Players-FirstJoin.head-text.3",
             STRING,
             "",
-            "Line 3 of the head message for first join (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_FIRSTJOIN_HEAD_TEXT_4 = create(
             "Players-FirstJoin.head-text.4",
             STRING,
-            "        &#6E00A5W&#7B17B4e&#882EC3l&#9545D2c&#A15CE1o&#AE73F0m&#BB8AFFe &#A53CFF%player_name%&f!",
-            "Line 4 of the head message for first join (if head is enabled)"
+            "&#6E00A5W&#7B17B4e&#882EC3l&#9545D2c&#A15CE1o&#AE73F0m&#BB8AFFe &#A53CFF%player_name%&f!",
+            ""
     );
     public static final ColdSetting<String> PLAYERS_FIRSTJOIN_HEAD_TEXT_5 = create(
             "Players-FirstJoin.head-text.5",
             STRING,
-            "        You can read the rules on our website!",
-            "Line 5 of the head message for first join (if head is enabled)"
+            "&cYou can read the rules on our website!",
+            ""
     );
     public static final ColdSetting<String> PLAYERS_FIRSTJOIN_HEAD_TEXT_6 = create(
             "Players-FirstJoin.head-text.6",
             STRING,
             "",
-            "Line 6 of the head message for first join (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_FIRSTJOIN_HEAD_TEXT_7 = create(
             "Players-FirstJoin.head-text.7",
             STRING,
             "",
-            "Line 7 of the head message for first join (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_FIRSTJOIN_HEAD_TEXT_8 = create(
             "Players-FirstJoin.head-text.8",
             STRING,
             "",
-            "Line 8 of the head message for first join (if head is enabled)"
+            ""
     );
-    // If you don't want the head, set "enable" to false; this option enables centered text for first join message.
+
     public static final ColdSetting<Boolean> PLAYERS_FIRSTJOIN_CENTER = create(
             "Players-FirstJoin.center",
             BOOLEAN,
             true,
-            "If you don't want the head, set 'enable' to false. Enable centered text for first join message."
-    );
-    // Fallback message for first join if head is disabled. Set as many lines as you need!
-    public static final ColdSetting<List<String>> PLAYERS_FIRSTJOIN_NO_HEAD_TEXT = create(
-            "Players-FirstJoin.no-head-text",
-            STRING_LIST,
-            Arrays.asList("Line1", "Line2", "Line3", "Line4", "Line5"),
-            "Fallback message for first join if head is disabled. Set as many lines as you need!"
+            "This will center the text based on the chat size."
     );
 
-    // Commands executed on first join. Put your commands without '/'.
-    // Default is a single dash indicating no command.
-    public static final ColdSetting<List<String>> COMMANDS_FIRST = create(
-            "Commands-First",
-            STRING_LIST,
-            Arrays.asList("-"),
-            "Commands executed on first join. Put your commands without '/'"
+    // --------------------------------------------------------------
+    //  SoundA (first join sound)
+    // --------------------------------------------------------------
+    public static final ColdSetting<CommentedConfigurationSection> SOUNDA_SECTION = create(
+            "SoundA",
+            "First Join Sound Settings",
+            "", // Blank line before section
+            ""  // Double blank line for more spacing
     );
 
-    // Need a sound when the player joins for the first time?
-    // Sounds: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
     public static final ColdSetting<Boolean> SOUND_A_ENABLE = create(
             "SoundA.enable",
             BOOLEAN,
@@ -144,21 +164,29 @@ public class SettingKey {
             "ENTITY_GOAT_SCREAMING_DEATH",
             "Sound played on first join. See: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html"
     );
-    // Values: 0.0 -> 1.0
     public static final ColdSetting<Double> SOUND_A_VOLUME = create(
             "SoundA.volume",
             DOUBLE,
             1.0,
             "Volume for first join sound (Values: 0.0 -> 1.0)"
     );
-    // Values: 0.0 -> 1.0
     public static final ColdSetting<Double> SOUND_A_PITCH = create(
             "SoundA.pitch",
             DOUBLE,
             1.0,
             "Pitch for first join sound (Values: 0.0 -> 1.0)"
     );
-    // Send fireworks when they spawn for the first time? Set to 0 to disable this.
+
+    // --------------------------------------------------------------
+    //  Firework (first join fireworks)
+    // --------------------------------------------------------------
+    public static final ColdSetting<CommentedConfigurationSection> FIREWORK_SECTION = create(
+            "Firework",
+            "Firework Settings",
+            "", // Blank line before section
+            ""  // Double blank line for more spacing
+    );
+
     public static final ColdSetting<Integer> FIREWORK_AMOUNT = create(
             "Firework.amount",
             INTEGER,
@@ -166,96 +194,96 @@ public class SettingKey {
             "Send fireworks when they spawn for the first time? Set to 0 to disable this."
     );
 
-    // ----------------- Basic joining (every time user joins the server) -----------------------------
-    // Face the returning players! Change the texts made available to you.
+    // --------------------------------------------------------------
+    //  Players-Back (returning players)
+    // --------------------------------------------------------------
+    public static final ColdSetting<CommentedConfigurationSection> PLAYERS_BACK_SECTION = create(
+            "Players-Back",
+            "Returning Player Settings",
+            "", // Blank line before section
+            ""  // Double blank line for more spacing
+    );
+
     public static final ColdSetting<Boolean> PLAYERS_BACK_ENABLE = create(
             "Players-Back.enable",
             BOOLEAN,
             true,
-            "Face the returning players! Enable the head message for returning players."
+            "A warm welcome for the old players! Enable the head message for returning players."
     );
 
-    // Head-text for returning players (if the head is enabled)
+    // showHead: whether to display the player's head for returning players
+    public static final ColdSetting<Boolean> PLAYERS_BACK_SHOWHEAD = create(
+            "Players-Back.showHead",
+            BOOLEAN,
+            true,
+            "If you need the player's head, set this to true."
+    );
+
     public static final ColdSetting<String> PLAYERS_BACK_HEAD_TEXT_1 = create(
             "Players-Back.head-text.1",
             STRING,
             "",
-            "Line 1 of the head message for returning players (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_BACK_HEAD_TEXT_2 = create(
             "Players-Back.head-text.2",
             STRING,
-            "        &#6E00A5W&#750DADe&#7C19B5l&#8326BEc&#8A32C6o&#913FCEm&#984BD6e &#A664E6b&#AD71EFa&#B47DF7c&#BB8AFFk &#FF0000%player_name%&#984BD6!",
-            "Line 2 of the head message for returning players (if head is enabled)"
+            "&#6E00A5W&#750DADe&#7C19B5l&#8326BEc&#8A32C6o&#913FCEm&#984BD6e &#A664E6b&#AD71EFa&#B47DF7c&#BB8AFFk &#FF0000%player_name%&#984BD6!",
+            ""
     );
     public static final ColdSetting<String> PLAYERS_BACK_HEAD_TEXT_3 = create(
             "Players-Back.head-text.3",
             STRING,
             "",
-            "Line 3 of the head message for returning players (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_BACK_HEAD_TEXT_4 = create(
             "Players-Back.head-text.4",
             STRING,
             "&#FF0000https://github.com/Cold-Development",
-            "Line 4 of the head message for returning players (if head is enabled). Default (commented): '        &#6E00A5W&#7B17B4e&#882EC3l&#9545D2c&#A15CE1o&#AE73F0m&#BB8AFFe &#A53CFF%player_name%&#FFFFFF!'"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_BACK_HEAD_TEXT_5 = create(
             "Players-Back.head-text.5",
             STRING,
-            "    &#FF0000&lhttps://store.mc-1st.net",
-            "Line 5 of the head message for returning players (if head is enabled)"
+            "&#FF0000&lhttps://store.mc-1st.net",
+            ""
     );
     public static final ColdSetting<String> PLAYERS_BACK_HEAD_TEXT_6 = create(
             "Players-Back.head-text.6",
             STRING,
             "",
-            "Line 6 of the head message for returning players (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_BACK_HEAD_TEXT_7 = create(
             "Players-Back.head-text.7",
             STRING,
             "",
-            "Line 7 of the head message for returning players (if head is enabled)"
+            ""
     );
     public static final ColdSetting<String> PLAYERS_BACK_HEAD_TEXT_8 = create(
             "Players-Back.head-text.8",
             STRING,
-            "        &8(( &bCold Development &8))",
-            "Line 8 of the head message for returning players (if head is enabled)"
+            "&8(( &bCold Development &8))",
+            ""
     );
-
-    // If you don't want the head, set "enable" to false; this option enables centered text for returning players' message.
     public static final ColdSetting<Boolean> PLAYERS_BACK_CENTER = create(
             "Players-Back.center",
             BOOLEAN,
             true,
-            "If you don't want the head, set 'enable' to false. Enable centered text for returning players' message."
-    );
-    // Fallback message for returning players if head is disabled. Set as many lines as you need!
-    public static final ColdSetting<List<String>> PLAYERS_BACK_NO_HEAD_TEXT = create(
-            "Players-Back.no-head-text",
-            STRING_LIST,
-            Arrays.asList(
-                    "----------------------------------",
-                    " ",
-                    "&fWelcome &#A53CFF%player_name%&f!",
-                    " ",
-                    "----------------------------------"
-            ),
-            "Fallback message for returning players if head is disabled. Set as many lines as you need!"
+            "This will center the text based on the chat size."
     );
 
-    // Commands executed on returning join. Put your commands without '/'.
-    // Default is a single dash indicating no command.
-    public static final ColdSetting<List<String>> COMMANDS_BACK = create(
-            "Commands-Back",
-            STRING_LIST,
-            Arrays.asList("-"),
-            "Commands executed on returning join. Put your commands without '/'"
+    // --------------------------------------------------------------
+    //  SoundB (returning join sound)
+    // --------------------------------------------------------------
+    public static final ColdSetting<CommentedConfigurationSection> SOUNDB_SECTION = create(
+            "SoundB",
+            "Returning Player Sound Settings",
+            "", // Blank line before section
+            ""  // Double blank line for more spacing
     );
-    // Need a sound when the player joins again?
-    // Sounds: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+
     public static final ColdSetting<Boolean> SOUND_B_ENABLE = create(
             "SoundB.enable",
             BOOLEAN,
@@ -268,14 +296,12 @@ public class SettingKey {
             "ENTITY_VILLAGER_CELEBRATE",
             "Sound played on returning join. See: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html"
     );
-    // Values: 0.0 -> 1.0
     public static final ColdSetting<Double> SOUND_B_VOLUME = create(
             "SoundB.volume",
             DOUBLE,
             1.0,
             "Volume for returning join sound (Values: 0.0 -> 1.0)"
     );
-    // Values: 0.0 -> 1.0
     public static final ColdSetting<Double> SOUND_B_PITCH = create(
             "SoundB.pitch",
             DOUBLE,
@@ -283,15 +309,27 @@ public class SettingKey {
             "Pitch for returning join sound (Values: 0.0 -> 1.0)"
     );
 
-    private static <T> ColdSetting<T> create(String key, ColdSettingSerializer<T> serializer, T defaultValue, String... comments) {
-        ColdSetting<T> setting = ColdSetting.backed(WelcomeHead.getInstance(), key, serializer, defaultValue, comments);
+    // ----------------------------------------------------------------------
+    //  Helper method to create a setting
+    // ----------------------------------------------------------------------
+    private static <T> ColdSetting<T> create(String key,
+                                             ColdSettingSerializer<T> serializer,
+                                             T defaultValue,
+                                             String... comments) {
+        ColdSetting<T> setting = ColdSetting.backed(
+                WelcomeHead.getInstance(),
+                key,
+                serializer,
+                defaultValue,
+                comments
+        );
         KEYS.add(setting);
         return setting;
     }
 
-    // Support for commented sections, if needed
     private static ColdSetting<CommentedConfigurationSection> create(String key, String... comments) {
-        ColdSetting<CommentedConfigurationSection> setting = ColdSetting.backedSection(WelcomeHead.getInstance(), key, comments);
+        ColdSetting<CommentedConfigurationSection> setting =
+                ColdSetting.backedSection(WelcomeHead.getInstance(), key, comments);
         KEYS.add(setting);
         return setting;
     }

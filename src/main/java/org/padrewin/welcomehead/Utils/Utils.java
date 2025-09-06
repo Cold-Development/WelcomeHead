@@ -74,15 +74,47 @@ public class Utils {
   }
 
 
-  public static void headNotActivated(Player player, List<String> path, boolean center) {
-    for (String msg : path) {
+  public static void headNotActivated(Player player, List<String> messages, boolean center) {
+    for (String line : messages) {
+      String translated = translateColors(line);
       if (center) {
-        CenterText.sendCenteredMessage(player, msg);
-        continue;
+        CenterText.sendCenteredMessage(player, translated);
+      } else {
+        player.sendMessage(translated);
       }
-      PlaceholderAPI.setPlaceholders(player, translateColors(msg));
     }
   }
+
+  public static String[] centerLines(String[] lines, int maxWidth) {
+    String[] centered = new String[lines.length];
+    for (int i = 0; i < lines.length; i++) {
+      centered[i] = centerLine(lines[i], maxWidth);
+    }
+    return centered;
+  }
+
+  private static String centerLine(String line, int maxWidth) {
+    // strip color codes to measure length
+    String plain = ChatColor.stripColor(line);
+    if (plain == null) {
+      plain = "";
+    }
+
+    int textLen = plain.length();
+
+    // how many spaces to pad in front?
+    int spacesToPad = (maxWidth - textLen) / 2;
+    if (spacesToPad < 0) spacesToPad = 0;
+
+    // build new line
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < spacesToPad; i++) {
+      sb.append(' ');
+    }
+    sb.append(line);
+    return sb.toString();
+  }
+
 
   public static void soundActivated(Player player, boolean enable, String sound, double volume, double pitch) {
     if (!enable) {
@@ -95,6 +127,4 @@ public class Utils {
     } catch (IllegalArgumentException e) {
     }
   }
-
-
 }
